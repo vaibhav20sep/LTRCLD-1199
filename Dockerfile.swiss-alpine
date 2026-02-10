@@ -1,3 +1,4 @@
+# License - https://github.com/vaibhav20sep/LTRCLD-1199/blob/main/LICENSE
 FROM alpine:3.20
 
 # Enable community repo (needed for many network tools)
@@ -61,3 +62,4 @@ WORKDIR /root
 
 # Default to a shell (so it remains a swiss-knife). Run telegraf manually when needed.
 CMD ["/bin/sh"]
+
