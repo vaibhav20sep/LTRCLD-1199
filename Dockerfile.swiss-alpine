@@ -1,0 +1,63 @@
+FROM alpine:3.20
+
+# Enable community repo (needed for many network tools)
+RUN sed -i 's/^#\(.*\/community\)$/\1/' /etc/apk/repositories && apk update
+
+# Install the full toolset (Swiss-knife + Telegraf + SNMP + DNS tools)
+RUN apk add --no-cache \
+    bash \
+    curl wget \
+    httpie \
+    fping \
+    iperf3 \
+    iproute2 \
+    iputils \
+    jq yq \
+    kcat \
+    mtr \
+    nano \
+    net-tools \
+    nmap \
+    openssh-client \
+    python3 py3-pip \
+    socat \
+    tcpdump \
+    tcsh \
+    inetutils-telnet \
+    traceroute \
+    whois \
+    telegraf \
+    net-snmp-tools \
+    bind-tools
+   
+
+# Telegraf config (kept minimal; outputs to stdout)
+RUN mkdir -p /etc/telegraf && \
+    cat > /etc/telegraf/telegraf.conf <<'EOF'
+[agent]
+  interval = "10s"
+  round_interval = true
+  metric_batch_size = 1000
+  metric_buffer_limit = 10000
+  flush_interval = "10s"
+  flush_jitter = "0s"
+  precision = ""
+  hostname = ""
+  omit_hostname = false
+
+[[inputs.cpu]]
+  percpu = true
+  totalcpu = true
+  collect_cpu_time = false
+  report_active = true
+
+[[inputs.mem]]
+
+[[outputs.file]]
+  files = ["stdout"]
+EOF
+
+WORKDIR /root
+
+# Default to a shell (so it remains a swiss-knife). Run telegraf manually when needed.
+CMD ["/bin/sh"]
